@@ -28,6 +28,60 @@ Tout d'abord, étant dans une spécialisation en cybersécurité, j'apprends à 
 
 ## 1 – MongoDB Standalone
 ## 2 – MongoDB Replica Set
+Déployer au moins 3 instances MongoDB en replica set:
+1. Préparation de l’environnement
+1.1 Création des répertoires de données
+Je Crée trois dossiers pour stocker les données de différentes instances qie je vais créer par la suite :
+mkdir -p /var/lib/mongo/rs0/db0 /var/lib/mongo/rs0/db1 /var/lib/mongo/rs0/db2  
+chown -R mongodb:mongodb /var/lib/mongo/rs0
+
+Chaque instance va avoir son propre chemin de données pour éviter les conflits entre les différentes instances.
+
+1.2 Création de fichiers de configuration
+Dupliquez le fichier /etc/mongod.conf pour obtenir trois configurations :
+
+cp /etc/mongod.conf /etc/mongod0.conf  
+cp /etc/mongod.conf /etc/mongod1.conf  
+cp /etc/mongod.conf /etc/mongod2.conf
+
+voici les configuration à faire dans les fichiers de configurations :  
+storage:
+  dbPath: /var/lib/mongo/rs0/db<N>      # db0, db1 ou db2
+net:
+  bindIp: 127.0.0.1                   # accès local uniquement
+  port: 2701<N>                       # 27010, 27011, 27012
+replication:
+  replSetName: "rs0"                  # même nom partout
+processManagement:
+  pidFilePath: /var/run/mongodb/rs0-<N>.pid
+
+2. Démarrage des trois instances
+2.1 Lancement manuel
+Pour chaque config, lancez :
+
+mongod --config /etc/mongod0.conf --fork --logpath /var/log/mongodb/rs0-0.log  
+mongod --config /etc/mongod1.conf --fork --logpath /var/log/mongodb/rs0-1.log  
+mongod --config /etc/mongod2.conf --fork --logpath /var/log/mongodb/rs0-2.log  
+Chaque instance écoute alors sur son port dédié
+
+3. Initialisation du replica set
+Connectez-vous à l’instance du port 27010 :
+
+mongosh --port 27010
+Lancez :
+
+js
+Copier
+Modifier
+rs.initiate({
+  _id: "rs0",
+  members: [
+    { _id: 0, host: "127.0.0.1:27010" },
+    { _id: 1, host: "127.0.0.1:27011" },
+    { _id: 2, host: "127.0.0.1:27012" }
+  ]
+})
+
 ## 3 – Intégration dans une application
 ##  4 – Sharding
 
