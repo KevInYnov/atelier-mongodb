@@ -70,9 +70,6 @@ Connectez-vous à l’instance du port 27010 :
 mongosh --port 27010
 Lancez :
 
-js
-Copier
-Modifier
 rs.initiate({
   _id: "rs0",
   members: [
@@ -81,6 +78,84 @@ rs.initiate({
     { _id: 2, host: "127.0.0.1:27012" }
   ]
 })
+
+4. Activation de l’authentification et création des utilisateurs
+4.1 Modifier les fichiers de config pour activer l’authentification
+   Dans les fichier de conf mongo suivant :
+   - mongod0.conf
+   - mongod1.conf
+   - mongod2.conf
+   
+   j'ai changer le paramettre suivant :
+   security:
+   authorization: enabled
+
+4.2 Redémarrer les instances
+Je redémarre les instances pour prendre en compte cette modification.
+je réalise la commande suivante pour voir le PID de mongodb
+voici la commande que j'ai faite et son résultat :
+root@debian:/etc# ps aux | grep mongod
+mongodb    39218  0.7  3.2 3716860 128896 ?      Ssl  11:11   2:18 /usr/bin/mongod --config /etc/mongod.conf
+
+Une fois cela trouver j'execute la commande suivante pour kill le processus :
+sudo kill 39218
+
+Une fois le kill réaliser il faut restart mongoDB
+mongod --config /etc/mongod0.conf
+mongod --config /etc/mongod1.conf
+mongod --config /etc/mongod2.conf
+
+4.3 Création de l’utilisateur admin
+Je me connecte à la base de données sans authentification :
+mongosh --port 27010
+
+Par la suite je crée un utilisateur administrateur dans la base admin :
+
+use admin
+db.createUser({
+  user: "admin",
+  pwd: "mon_mdp_super_secret",
+  roles: [ { role: "root", db: "admin" } ]
+})
+
+4.4 Tester la connexion authentifiée
+Maintenant que l’utilisateur existe, je me connecte avec celui-ci pour voir si ce nouvelle utilisateur fonctionne :
+
+mongosh --port 27010 -u admin -p mon_mdp_super_secret --authenticationDatabase admin
+
+5. Création de la base testdb et insertion de documents
+5.1 Connexion authentifiée
+Reste connecté en admin (ou reconnecte-toi) sur le port 27010.
+
+5.2 Création de la base et insertion
+
+use testdb
+
+db.testcollection.insertMany([
+  { nom: "Alice", age: 25 },
+  { nom: "Bob", age: 30 }
+])
+
+6. Test de la réplication (lecture sur secondaires)
+6.1 Connexion sur une instance secondaire
+
+Exemple sur le port 27011 :
+
+mongosh --port 27011 -u admin -p mon_mdp_super_secret --authenticationDatabase admin
+
+6.2 Lire la collection en mode lecture secondaire
+Par défaut, la lecture se fait sur PRIMARY. Pour lire sur SECONDARY, il faut préciser dans la commande la préférence de lecture :
+
+db.getMongo().setReadPref('secondary')
+db.testcollection.find().pretty()
+
+7. Connexion via URI (utile pour applications)
+Exemple de connexion MongoDB URI avec replica set et authentification :
+
+mongodb://admin:mon_mdp_super_secret@127.0.0.1:27010,127.0.0.1:27011,127.0.0.1:27012/testdb?replicaSet=rs0&readPreference=secondary
+Tu peux tester avec mongosh en ligne de commande (nécessite mongosh > 1.6) :
+mongosh "mongodb://admin:mon_mdp_super_secret@127.0.0.1:27010,127.0.0.1:27011,127.0.0.1:27012/testdb?replicaSet=rs0&readPreference=secondary"
+
 
 ## 3 – Intégration dans une application
 ##  4 – Sharding
