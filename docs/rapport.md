@@ -23,7 +23,7 @@ Pour le déploiement de notre serveur de base de données MongoDB, nous avons op
 
 Dans un premier temps nous allons créer l'arborescence demander à s'avoir :
 
-![Texte alternatif](1.png)
+![Texte alternatif](img/1.png)
 
 Une fois l'arborescence créer nous le déposeront sur la **branch** `main` afin que tout le monde puisse partir de la même base pour avancé efficacement en évitant le plus possible les merges.
 Pour ce faire : 
