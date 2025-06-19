@@ -23,7 +23,7 @@ Pour le déploiement de notre serveur de base de données MongoDB, nous avons op
 
 Dans un premier temps nous allons créer l'arborescence demander à s'avoir :
 
-![Texte alternatif](img/1.png)
+![img](img/1.png)
 
 Une fois l'arborescence créer nous le déposeront sur la **branch** `main` afin que tout le monde puisse partir de la même base pour avancé efficacement en évitant le plus possible les merges.
 Pour ce faire : 
@@ -66,7 +66,7 @@ Vérifie que MongoDB fonctionne :
 Tester la connexion : 
 `mongosh`
 
-![[2.png]]
+![img](img/2.png)
 
 Une fois la liste d'étapes terminer MogoDB est prêt à être utiliser.
 
@@ -86,11 +86,11 @@ Puis créer l'utilisateur `admin` qui auras tout les droits `root` :
 Vous pourrez ensuite vérifier les utilisateur créer avec :
 `db.getUsers()`
 
-![[3.png]]
+![img](img/3.png)
 
 Une fois l'utilisateur créer il nous suffit d'activer l'authentification en modifiant le fichier conf qui ce trouve ici : `/etc/mongod.conf`
 
-![[4.png]]
+![img](img/4.png)
 
 Explication : 
 	- enlever le commentaire dans `security` pour activer les options de sécurité.
@@ -111,7 +111,7 @@ Pour vérifié les droit de l'utilisateur créer :
 `use admin`
 `db.getUser("admin")`
 
-![[6.png]]
+![img](img/6.png)
 
 Vous avez donc les droit n'nécessaire et avez activé l'authentification. 
 
@@ -127,7 +127,7 @@ Une fois la collection créer il nous suffit d'ajouter des données avec :
 Pour voir les données : 
 `db.users.find()`
 
-![[7.png]]
+![img](img/7.png)
 
 Pour supprimé une donné :
 `db.users.deleteOne({name: "Abdoul"})`
@@ -135,7 +135,7 @@ Pour supprimé une donné :
 Pour modifier une donné :
 `db.users.updateOne({name: "Diana"}, {$set: {age: 40}})`
 
-![[8.png]]
+![img](img/8.png)
 
 ## 2 – MongoDB Replica Set
 
@@ -247,9 +247,9 @@ Dans le fichier `index.js` écrire un script qui simule une application avec :
 Pour lancé l'application : 
 `node index.js`
 
-![[9.png]]
+![img](img/9.png)
 
 Puis vérifier dans la console mongosh.
 
-![[10.png]]
+![img](img/10.png)
 
