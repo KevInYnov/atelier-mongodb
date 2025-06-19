@@ -12,16 +12,12 @@ Il nous a été demandé de réaliser les objectifs suivants :
 - Connexion à MongoDB via URI avec gestion des préférences de lecture et des modes de réplication
 - Développement d’une application connectée à MongoDB (sécurisée, support des opérations CRUD)
 - Tests réalisés sur standalone et replica set avec documentation des méthodes de connexion
-- (Bonus) Déploiement d’une architecture sharding avec shards, config servers et mongos router
-- Activation du sharding sur une base, définition d’une clé de sharding, observation de la répartition des données
 
 # Environnement
 
 Etant un groupe de 5 personnes, afin de pouvoir collaborer efficacement nous avons décider de créer un `GitHub` qui ce composera de 6 `Branch`, une par personnes plus la `Branch` main qui regroupera l'ensemble du travail réaliser. 
 
-Nous avons décider d'utiliser des vitual machine `VM` afin de réaliser le projet. 
-Nous avons choisi de travailler sur un système d'exploitation Parrot (une distribution Linux) pour ce projet, et ce, pour plusieurs raisons. 
-Tout d'abord, étant dans une spécialisation en cybersécurité, j'apprends à utiliser les outils que je serai amené à maîtriser dans ma future vocation, et rien de mieux que la pratique pour cela. 
+Pour le déploiement de notre serveur de base de données MongoDB, nous avons opté pour une solution Docker, afin de garantir un environnement de développement reproductible, isolé et facile à déployer.
 
 # Setup GitHub
 
@@ -121,11 +117,139 @@ Vous avez donc les droit n'nécessaire et avez activé l'authentification.
 
 ### Créer une base `testdb` avec une collection de test
 
-Maintenant nous allons créer nôtre première base de donné que nous appelleront `testdb`.
+Maintenant nous allons créer nôtre première base de donné que nous appelleront `testdb` avec une collection d'utilisateurs :
+`use testdb`
+`db.createCollection("users")`
 
+Une fois la collection créer il nous suffit d'ajouter des données avec :
+`db.users.insertOne({ name: "Diana", age: 28 })`
 
+Pour voir les données : 
+`db.users.find()`
+
+![[7.png]]
+
+Pour supprimé une donné :
+`db.users.deleteOne({name: "Abdoul"})`
+
+Pour modifier une donné :
+`db.users.updateOne({name: "Diana"}, {$set: {age: 40}})`
+
+![[8.png]]
 
 ## 2 – MongoDB Replica Set
+
+Déployer au moins 3 instances MongoDB en replica set:
+
+1. Préparation de l’environnement 1.1 Création des répertoires de données Je Crée trois dossiers pour stocker les données de différentes instances qie je vais créer par la suite : 
+   mkdir -p /var/lib/mongo/rs0/db0 /var/lib/mongo/rs0/db1 /var/lib/mongo/rs0/db2  
+    chown -R mongodb:mongodb /var/lib/mongo/rs0
+
+Chaque instance va avoir son propre chemin de données pour éviter les conflits entre les différentes instances.
+
+1.2 Création de fichiers de configuration Dupliquez le fichier /etc/mongod.conf pour obtenir trois configurations :
+
+cp /etc/mongod.conf /etc/mongod0.conf  
+cp /etc/mongod.conf /etc/mongod1.conf  
+cp /etc/mongod.conf /etc/mongod2.conf
+
+voici les configuration à faire dans les fichiers de configurations :  
+storage: dbPath: /var/lib/mongo/rs0/db # db0, db1 ou db2 net: bindIp: 127.0.0.1 # accès local uniquement port: 2701 # 27010, 27011, 27012 replication: replSetName: "rs0" # même nom partout processManagement: pidFilePath: /var/run/mongodb/rs0-.pid
+
+2. Démarrage des trois instances 2.1 Lancement manuel Pour chaque config, lancez :
+
+mongod --config /etc/mongod0.conf --fork --logpath /var/log/mongodb/rs0-0.log  
+mongod --config /etc/mongod1.conf --fork --logpath /var/log/mongodb/rs0-1.log  
+mongod --config /etc/mongod2.conf --fork --logpath /var/log/mongodb/rs0-2.log  
+Chaque instance écoute alors sur son port dédié
+
+3. Initialisation du replica set Connectez-vous à l’instance du port 27010 :
+
+mongosh --port 27010 Lancez :
+
+rs.initiate({ _id: "rs0", members: [ { _id: 0, host: "127.0.0.1:27010" }, { _id: 1, host: "127.0.0.1:27011" }, { _id: 2, host: "127.0.0.1:27012" } ] })
+
+4. Activation de l’authentification et création des utilisateurs 4.1 Modifier les fichiers de config pour activer l’authentification Dans les fichier de conf mongo suivant :
+    
+    - mongod0.conf
+    - mongod1.conf
+    - mongod2.conf
+    
+    j'ai changer le paramettre suivant : security: authorization: enabled
+    
+
+4.2 Redémarrer les instances Je redémarre les instances pour prendre en compte cette modification. je réalise la commande suivante pour voir le PID de mongodb voici la commande que j'ai faite et son résultat : root@debian:/etc# ps aux | grep mongod mongodb 39218 0.7 3.2 3716860 128896 ? Ssl 11:11 2:18 /usr/bin/mongod --config /etc/mongod.conf
+
+Une fois cela trouver j'execute la commande suivante pour kill le processus : sudo kill 39218
+
+Une fois le kill réaliser il faut restart mongoDB mongod --config /etc/mongod0.conf mongod --config /etc/mongod1.conf mongod --config /etc/mongod2.conf
+
+4.3 Création de l’utilisateur admin Je me connecte à la base de données sans authentification : mongosh --port 27010
+
+Par la suite je crée un utilisateur administrateur dans la base admin :
+
+use admin db.createUser({ user: "admin", pwd: "mon_mdp_super_secret", roles: [ { role: "root", db: "admin" } ] })
+
+4.4 Tester la connexion authentifiée Maintenant que l’utilisateur existe, je me connecte avec celui-ci pour voir si ce nouvelle utilisateur fonctionne :
+
+mongosh --port 27010 -u admin -p mon_mdp_super_secret --authenticationDatabase admin
+
+5. Création de la base testdb et insertion de documents 5.1 Connexion authentifiée Reste connecté en admin (ou reconnecte-toi) sur le port 27010.
+
+5.2 Création de la base et insertion
+
+use testdb
+
+db.testcollection.insertMany([ { nom: "Alice", age: 25 }, { nom: "Bob", age: 30 } ])
+
+6. Test de la réplication (lecture sur secondaires) 6.1 Connexion sur une instance secondaire
+
+Exemple sur le port 27011 :
+
+mongosh --port 27011 -u admin -p mon_mdp_super_secret --authenticationDatabase admin
+
+6.2 Lire la collection en mode lecture secondaire Par défaut, la lecture se fait sur PRIMARY. Pour lire sur SECONDARY, il faut préciser dans la commande la préférence de lecture :
+
+db.getMongo().setReadPref('secondary') db.testcollection.find().pretty()
+
+7. Connexion via URI (utile pour applications) Exemple de connexion MongoDB URI avec replica set et authentification :
+
+mongodb://admin:mon_mdp_super_secret@127.0.0.1:27010,127.0.0.1:27011,127.0.0.1:27012/testdb?replicaSet=rs0&readPreference=secondary Tu peux tester avec mongosh en ligne de commande (nécessite mongosh > 1.6) : mongosh "mongodb://admin:mon_mdp_super_secret@127.0.0.1:27010,127.0.0.1:27011,127.0.0.1:27012/testdb?replicaSet=rs0&readPreference=secondary"
 ## 3 – Intégration dans une application
-##  4 – Sharding
+
+Nous allons maintenant intégrer nôtre base de donné à une application, pour ce faire :
+
+Créer le dossier de l'application : 
+`mkdir mongo-app`
+
+Initié l'environnement node.js :
+`npm init -y`
+
+Installé les dépendance :
+`npm install mongodb dotenv`
+
+Puis créer 2 fichiers :
+	fichier : `.env`
+	fichier : `index.js`
+
+Dans le fichier `.env` écrire l'URI pour permettre la connexion à la BDD :
+`MONGO_URI=mongodb://admin:adminpass@localhost:27017/testdb
+`
+Dans le fichier `index.js` écrire un script qui simule une application avec :
+`const uri = process.env.MONGO_URI;` -> récupérer les info de connexion 
+`const client = new MongoClient(uri);` -> établir la connexion
+`const db = client.db("testdb");` -> indique la BDD utilisé
+`const collection = db.collection("test");` indique la collection utilisé
+`collection.insertOne({ name: "AppUser", age: 29 });` -> Insert des données
+`collection.updateOne({ name: "AppUser" }, { $set: { age: 30 } });` -> modifie des données
+`collection.deleteOne({ name: "AppUser" });` -> Supprime des données
+
+Pour lancé l'application : 
+`node index.js`
+
+![[9.png]]
+
+Puis vérifier dans la console mongosh.
+
+![[10.png]]
 

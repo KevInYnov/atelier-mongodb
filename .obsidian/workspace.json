@@ -11,6 +11,30 @@
             "id": "76db574803489233",
             "type": "leaf",
             "state": {
+              "type": "image",
+              "state": {
+                "file": "docs/img/10.png"
+              },
+              "icon": "lucide-image",
+              "title": "10"
+            }
+          },
+          {
+            "id": "1c367177bcd24515",
+            "type": "leaf",
+            "state": {
+              "type": "image",
+              "state": {
+                "file": "docs/img/10.png"
+              },
+              "icon": "lucide-image",
+              "title": "10"
+            }
+          },
+          {
+            "id": "899a245437e1b34e",
+            "type": "leaf",
+            "state": {
               "type": "markdown",
               "state": {
                 "file": "docs/rapport.md",
@@ -21,7 +45,8 @@
               "title": "rapport"
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -168,18 +193,51 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "76db574803489233",
+  "active": "6badc46edd5f2a6a",
   "lastOpenFiles": [
-    "1.png",
-    "2.png",
-    "3.png",
-    "4.png",
-    "5.png",
-    "6.png",
     "README.md",
     "docs/rapport.md",
-    "docs/img/Nouveau Document texte.txt",
-    "docs/img",
-    "docs/Nouveau dossier"
+    "docs/img/9.png",
+    "docs/img/10.png",
+    "Pasted image 20250619145721.png",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/wire_protocol/on_demand/document.ts",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/auth/mongodb_oidc/token_machine_workflow.ts",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/auth/mongodb_oidc/token_cache.ts",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/auth/mongodb_oidc/human_callback_workflow.ts",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/auth/mongodb_oidc/k8s_machine_workflow.ts",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/auth/mongodb_oidc/gcp_machine_workflow.ts",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/auth/mongodb_oidc/command_builders.ts",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/auth/mongodb_oidc/callback_workflow.ts",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/auth/mongodb_oidc/azure_machine_workflow.ts",
+    "integration/nodejs/mongo-app/node_modules/mongodb/src/cmap/auth/mongodb_oidc/automated_callback_workflow.ts",
+    "integration/nodejs/mongo-app/node_modules/bson/vendor/text-encoding/README.md",
+    "integration/nodejs/mongo-app/node_modules/bson/vendor/text-encoding/LICENSE.md",
+    "integration/nodejs/mongo-app/node_modules/bson/vendor/base64/README.md",
+    "integration/nodejs/mongo-app/node_modules/@types/whatwg-url/README.md",
+    "integration/nodejs/mongo-app/node_modules/@types/webidl-conversions/README.md",
+    "integration/nodejs/mongo-app/node_modules/@mongodb-js/saslprep/readme.md",
+    "integration/nodejs/mongo-app/node_modules/whatwg-url/README.md",
+    "integration/nodejs/mongo-app/node_modules/webidl-conversions/README.md",
+    "integration/nodejs/mongo-app/node_modules/tr46/README.md",
+    "integration/nodejs/mongo-app/node_modules/webidl-conversions/LICENSE.md",
+    "integration/nodejs/mongo-app/node_modules/tr46/LICENSE.md",
+    "integration/nodejs/mongo-app/node_modules/sparse-bitfield/README.md",
+    "integration/nodejs/mongo-app/node_modules/punycode/README.md",
+    "integration/nodejs/mongo-app/node_modules/mongodb-connection-string-url/README.md",
+    "integration/nodejs/mongo-app/node_modules/mongodb/README.md",
+    "integration/nodejs/mongo-app/node_modules/mongodb/LICENSE.md",
+    "integration/nodejs/mongo-app/node_modules/memory-pager/README.md",
+    "integration/nodejs/mongo-app/node_modules/dotenv/README.md",
+    "integration/nodejs/mongo-app/node_modules/dotenv/README-es.md",
+    "integration/nodejs/mongo-app/node_modules/dotenv/CHANGELOG.md",
+    "integration/nodejs/mongo-app/node_modules/bson/README.md",
+    "integration/nodejs/mongo-app/node_modules/bson/LICENSE.md",
+    "docs/img/8.png",
+    "docs/img/7.png",
+    "docs/img/1.png",
+    "docs/img/2.png",
+    "docs/img/3.png",
+    "docs/img/4.png",
+    "docs/img/5.png"
   ]
 }
